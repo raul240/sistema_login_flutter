@@ -1,37 +1,101 @@
 import 'package:flutter/material.dart';
+import 'package:aula_vitor_2/pages/home_page.dart';
+import 'package:aula_vitor_2/service/api.service.dart';
+import 'cadastro_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginPage extends StatefulWidget{
+    const LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
+    @override
+    State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>{
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
-  bool esconderSenha = true;
 
-  void mostrarmensagem(String mensagem) {
+  bool esconderSenha = true;
+  bool carregando = false;
+
+
+  void mostrarMensagem(String mensagem){
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
+      SnackBar(
+        content: Text(mensagem)
+      ),
     );
   }
 
-  void entrar() {
+  Future<void> entrar() async {
     String email = emailController.text.trim();
     String senha = senhaController.text;
 
     if (email.isEmpty || senha.isEmpty) {
-      mostrarmensagem('preencha o e-mail e a senha.');
+      mostrarMensagem('Preencha o e-mail e a senha.');
       return;
     }
 
-    mostrarmensagem('Login realizado com sucesso!');
+    setState(() {
+      carregando = true;
+    });
+
+    final resultado = await ApiService.login(
+      email: email,
+      senha: senha,
+    );
+
+    setState(() {
+      carregando = false;
+    });
+
+    if (resultado['sucesso'] == true) {
+      final dados = resultado['dados'];
+      final usuario = dados['usuario'];
+
+      if (usuario == null || usuario is! Map<String, dynamic>) {
+        mostrarMensagem('Dados do usuário inválidos.');
+        return;
+      }
+
+      final String nome = usuario['nome'] ?? 'Usuario';
+      final String emailUsuario = usuario['email'] ?? email;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(
+            nomeUsuario: nome,
+            emailUsuario: emailUsuario,
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    mostrarMensagem(
+      resultado['mensagem'] ?? 'E-mail ou senha incorretos.',
+    );
+  }
+
+  void abrirCadastro(){
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CadastroPage()),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
+  void dispose(){
+    emailController.dispose();
+    senhaController.dispose();
+
+    super.dispose();
+  }
+   
+  @override
+  Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
@@ -40,73 +104,96 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 40,),
+
+            
             const Icon(
               Icons.account_circle,
               size: 100,
             ),
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 20,),
+
             const Text(
-              'bem-vindo',
+              'Bem-vindo',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 28,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.bold
               ),
             ),
-            const SizedBox(height: 5),
+
+            const SizedBox(height: 5,),
+
             const Text(
-              'entre com a sua conta para acessar',
-              textAlign: TextAlign.center,
+              'Entre com a sua conta para acessar o sistema.',
+              textAlign: TextAlign.center,              
             ),
-            const SizedBox(height: 30),
+
+            const SizedBox(height: 30,),
+
             TextField(
               controller: emailController,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.emailAddress,              
               decoration: const InputDecoration(
-                labelText: 'e-mail',
-                hintText: 'digite seu e-mail',
+                labelText: 'E-mail',
+                hintText: 'Digite seu e-mail',
                 prefixIcon: Icon(Icons.email),
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 15,),
+
             TextField(
-              controller: senhaController,
-              obscureText: esconderSenha,
+              controller: senhaController,   
+              obscureText: esconderSenha,                       
               decoration: InputDecoration(
                 labelText: 'Senha',
                 hintText: 'Digite sua senha',
                 prefixIcon: const Icon(Icons.lock),
                 border: const OutlineInputBorder(),
+
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    esconderSenha ? Icons.visibility_off : Icons.visibility,
-                  ),
-                  onPressed: () {
+                  onPressed: (){
                     setState(() {
                       esconderSenha = !esconderSenha;
                     });
-                  },
+                  }, 
+                  icon: Icon(
+                    esconderSenha ? Icons.visibility : Icons.visibility_off
+                  )
                 ),
-              ),
+              ),             
             ),
-            const SizedBox(height: 25),
+
+            const SizedBox(height: 25,),
+
             ElevatedButton.icon(
-              onPressed: entrar,
-              icon: const Icon(Icons.login),
+              onPressed: carregando ? null : entrar,
+              icon: carregando 
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.login),
               label: const Text('Entrar'),
             ),
+
             const SizedBox(height: 10),
+
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: abrirCadastro,
               icon: const Icon(Icons.person_add),
               label: const Text('Criar usuário'),
-            ),
+            )
+
           ],
         ),
-      ),
+      )
     );
   }
-}
+} 
