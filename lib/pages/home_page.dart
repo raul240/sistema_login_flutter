@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+import '../telas/inicio_tela.dart';
+import '../telas/cursos_tela.dart';
+import '../telas/favoritos_tela.dart';
+import '../telas/perfil_tela.dart';
+
+class HomePage extends StatefulWidget {
   final String nomeUsuario;
   final String emailUsuario;
 
@@ -11,40 +16,56 @@ class HomePage extends StatelessWidget {
   });
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int paginaSelecionada = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('sistema'),
-        centerTitle: true,
+    final telas = [
+      InicioTela(
+        nomeUsuario: widget.nomeUsuario,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'Bem-vindo ao sistema!',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                nomeUsuario,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(emailUsuario),
-            ],
+      const CursosTela(),
+      const FavoritosTela(),
+      PerfilTela(
+        nomeUsuario: widget.nomeUsuario,
+        emailUsuario: widget.emailUsuario,
+      ),
+    ];
+
+    return Scaffold(
+      body: telas[paginaSelecionada],
+
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: paginaSelecionada,
+
+        onDestinationSelected: (index) {
+          setState(() {
+            paginaSelecionada = index;
+          });
+        },
+
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home),
+            label: 'Início',
           ),
-        ),
+          NavigationDestination(
+            icon: Icon(Icons.school),
+            label: 'Cursos',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.favorite),
+            label: 'Favoritos',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
       ),
     );
   }
