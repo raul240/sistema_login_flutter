@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class Curso {
@@ -54,8 +53,4 @@ final List<Curso> cursos = [
   ),
 ];
 
-List<Curso> favoritos = [
-  cursos[0],
-  cursos[1],
-  cursos[2],
-];
+List<Curso> favoritos = [];

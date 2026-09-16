@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../Dados_mock.dart';
 
 class FavoritosTela extends StatelessWidget {
-  final List<String> favoritos;
+  final List<Curso> favoritos;
 
   const FavoritosTela({
     super.key,
@@ -13,7 +13,7 @@ class FavoritosTela extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cursosFavoritos = cursos.where(
-      (curso) => favoritos.contains(curso.nome),
+      (curso) => favoritos.contains(curso),
     ).toList();
 
     return Scaffold(

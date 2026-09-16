@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../Dados_mock.dart';
 import '../telas/inicio_tela.dart';
 import '../telas/cursos_tela.dart';
 import '../telas/favoritos_tela.dart';
@@ -21,19 +22,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int paginaSelecionada = 0;
-  final List<String> favoritos = [];
-
-  void alterarFavorito(String nomeCurso, bool adicionar) {
-    setState(() {
-      if (adicionar) {
-        if (!favoritos.contains(nomeCurso)) {
-          favoritos.add(nomeCurso);
-        }
-      } else {
-        favoritos.remove(nomeCurso);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +31,17 @@ class _HomePageState extends State<HomePage> {
       ),
       CursosTela(
         favoritos: favoritos,
-        onFavoritarAlterado: alterarFavorito,
+        onFavoritarAlterado: (curso, adicionar) {
+          setState(() {
+            if (adicionar) {
+              if (!favoritos.contains(curso)) {
+                favoritos.add(curso);
+              }
+            } else {
+              favoritos.remove(curso);
+            }
+          });
+        },
       ),
       FavoritosTela(
         favoritos: favoritos,
@@ -88,3 +86,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
