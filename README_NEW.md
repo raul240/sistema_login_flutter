@@ -1,4 +1,4 @@
-﻿# aula_vitor_2
+# aula_vitor_2
 
 A new Flutter project.
 
