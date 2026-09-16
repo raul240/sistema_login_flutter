@@ -1,51 +1,51 @@
 import 'package:flutter/material.dart';
 
+import '../Dados_mock.dart';
+
 class FavoritosTela extends StatelessWidget {
-  const FavoritosTela({super.key});
+  final List<String> favoritos;
+
+  const FavoritosTela({
+    super.key,
+    required this.favoritos,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final cursosFavoritos = cursos.where(
+      (curso) => favoritos.contains(curso.nome),
+    ).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Favoritos'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.favorite,
-                color: Colors.red,
-              ),
-              title: Text('Flutter Básico'),
-              subtitle: Text('Criação de aplicativos mobile'),
-            ),
-          ),
+      body: cursosFavoritos.isEmpty
+          ? const Center(
+              child: Text('Nenhum curso favorito ainda.'),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: cursosFavoritos.length,
+              itemBuilder: (context, index) {
+                final curso = cursosFavoritos[index];
 
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.favorite,
-                color: Colors.red,
-              ),
-              title: Text('Dart Essencial'),
-              subtitle: Text('Fundamentos da linguagem Dart'),
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    leading: Icon(
+                      curso.icone,
+                      color: Colors.red,
+                    ),
+                    title: Text(curso.nome),
+                    subtitle: Text(
+                      '${curso.descricao}\n${curso.quantidadeAulas} aulas',
+                    ),
+                    isThreeLine: true,
+                  ),
+                );
+              },
             ),
-          ),
-
-          Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.favorite,
-                color: Colors.red,
-              ),
-              title: Text('Banco de Dados'),
-              subtitle: Text('Conceitos básicos de banco de dados'),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,66 +1,146 @@
 import 'package:flutter/material.dart';
 
-class CursosTela extends StatelessWidget {
-  const CursosTela({super.key});
+class CursosTela extends StatefulWidget {
+  final List<String> favoritos;
+  final void Function(String nomeCurso, bool adicionar) onFavoritarAlterado;
+
+  const CursosTela({
+    super.key,
+    required this.favoritos,
+    required this.onFavoritarAlterado,
+  });
+
+  @override
+  State<CursosTela> createState() => _CursosTelaState();
+}
+
+class _CursosTelaState extends State<CursosTela> {
+  final TextEditingController pesquisaController =
+      TextEditingController();
+
+  final List<Map<String, dynamic>> cursos = [
+    {
+      'nome': 'Dart Essencial',
+      'descricao': 'Aprenda os fundamentos da linguagem Dart.',
+      'aulas': 10,
+      'icone': Icons.code,
+    },
+    {
+      'nome': 'Flutter Básico',
+      'descricao': 'Aprenda a criar aplicativos mobile.',
+      'aulas': 12,
+      'icone': Icons.phone_android,
+    },
+    {
+      'nome': 'Interface Mobile',
+      'descricao': 'Aprenda a criar interfaces para aplicativos.',
+      'aulas': 8,
+      'icone': Icons.design_services,
+    },
+    {
+      'nome': 'Conexão com API',
+      'descricao': 'Aprenda a conectar seu aplicativo com APIs.',
+      'aulas': 10,
+      'icone': Icons.api,
+    },
+    {
+      'nome': 'Banco de Dados',
+      'descricao': 'Aprenda os conceitos básicos de banco de dados.',
+      'aulas': 14,
+      'icone': Icons.storage,
+    },
+    {
+      'nome': 'Desenvolvimento Mobile',
+      'descricao': 'Aprenda conceitos de desenvolvimento mobile.',
+      'aulas': 12,
+      'icone': Icons.smartphone,
+    },
+  ];
+
+  String pesquisa = '';
+
+  @override
+  void dispose() {
+    pesquisaController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final cursosFiltrados = cursos.where((curso) {
+      final nome = curso['nome'].toString().toLowerCase();
+
+      return nome.contains(pesquisa.toLowerCase());
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cursos'),
       ),
-      body: ListView(
+      body: Padding(
         padding: const EdgeInsets.all(16),
-        children: const [
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.code),
-              title: Text('Dart Essencial'),
-              subtitle: Text('Fundamentos da linguagem Dart'),
+        child: Column(
+          children: [
+            TextField(
+              controller: pesquisaController,
+              onChanged: (valor) {
+                setState(() {
+                  pesquisa = valor;
+                });
+              },
+              decoration: const InputDecoration(
+                labelText: 'Pesquisar curso',
+                hintText: 'Digite o nome do curso',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
 
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.phone_android),
-              title: Text('Flutter Básico'),
-              subtitle: Text('Criação de aplicativos mobile'),
-            ),
-          ),
+            const SizedBox(height: 16),
 
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.design_services),
-              title: Text('Interface Mobile'),
-              subtitle: Text('Criação de interfaces para aplicativos'),
-            ),
-          ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: cursosFiltrados.length,
+                itemBuilder: (context, index) {
+                  final curso = cursosFiltrados[index];
+                  final nomeCurso = curso['nome'].toString();
+                  final estaFavoritado = widget.favoritos.contains(nomeCurso);
 
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.api),
-              title: Text('Conexão com API'),
-              subtitle: Text('Aprenda a consumir APIs'),
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      leading: Icon(
+                        curso['icone'],
+                        size: 35,
+                      ),
+                      title: Text(
+                        nomeCurso,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${curso['descricao']}\n${curso['aulas']} aulas',
+                      ),
+                      isThreeLine: true,
+                      trailing: IconButton(
+                        onPressed: () {
+                          widget.onFavoritarAlterado(nomeCurso, !estaFavoritado);
+                        },
+                        icon: Icon(
+                          estaFavoritado ? Icons.favorite : Icons.favorite_border,
+                          color: estaFavoritado ? Colors.red : null,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.storage),
-              title: Text('Banco de Dados'),
-              subtitle: Text('Conceitos básicos de banco de dados'),
-            ),
-          ),
-
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.developer_mode),
-              title: Text('Desenvolvimento Mobile'),
-              subtitle: Text('Desenvolvimento de aplicativos'),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+

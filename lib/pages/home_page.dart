@@ -21,6 +21,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int paginaSelecionada = 0;
+  final List<String> favoritos = [];
+
+  void alterarFavorito(String nomeCurso, bool adicionar) {
+    setState(() {
+      if (adicionar) {
+        if (!favoritos.contains(nomeCurso)) {
+          favoritos.add(nomeCurso);
+        }
+      } else {
+        favoritos.remove(nomeCurso);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +41,13 @@ class _HomePageState extends State<HomePage> {
       InicioTela(
         nomeUsuario: widget.nomeUsuario,
       ),
-      const CursosTela(),
-      const FavoritosTela(),
+      CursosTela(
+        favoritos: favoritos,
+        onFavoritarAlterado: alterarFavorito,
+      ),
+      FavoritosTela(
+        favoritos: favoritos,
+      ),
       PerfilTela(
         nomeUsuario: widget.nomeUsuario,
         emailUsuario: widget.emailUsuario,

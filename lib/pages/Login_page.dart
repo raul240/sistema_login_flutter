@@ -51,15 +51,9 @@ class _LoginPageState extends State<LoginPage>{
 
     if (resultado['sucesso'] == true) {
       final dados = resultado['dados'];
-      final usuario = dados['usuario'];
 
-      if (usuario == null || usuario is! Map<String, dynamic>) {
-        mostrarMensagem('Dados do usuário inválidos.');
-        return;
-      }
-
-      final String nome = usuario['nome'] ?? 'Usuario';
-      final String emailUsuario = usuario['email'] ?? email;
+      final String nome = dados['nome'] ?? 'Usuario';
+      final String emailUsuario = dados['email'] ?? email;
 
       Navigator.pushReplacement(
         context,
